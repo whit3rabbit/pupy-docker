@@ -1,7 +1,5 @@
 # Use an official Python 3.8 slim image based on Debian Buster
 FROM python:3.8-slim-buster AS builder
-LABEL maintainer="AI Assistant based on user requirements"
-LABEL description="Enhanced Dockerfile for Pupy C2 with Python 3.8 supporting both pupysh and pupygen"
 
 # **** Set ARG Values ****
 ARG PUPY_USER=pupy
