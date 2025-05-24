@@ -1,0 +1,51 @@
+# Core Functionality & Networking
+# Fix: Use pycryptodome instead of pycryptodomex for Crypto.* imports
+pycryptodome~=3.19.0
+pefile~=2019.4.18
+pyyaml~=5.3
+rsa==4.0
+netaddr==0.7.19
+ecdsa==0.13
+paramiko==2.7.2
+tinyec @ https://github.com/alxchk/tinyec/archive/master.zip
+psutil~=5.7.0
+netifaces~=0.10.9
+pylzma~=0.5.0
+colorama~=0.4.3
+mss==4.0.3
+# Fix: Use compatible versions of pyOpenSSL and cryptography
+pyOpenSSL~=22.0.0
+cryptography~=36.0.0
+scapy~=2.4.3
+impacket~=0.9.22
+dnslib~=0.9.10
+http-parser~=0.9.0
+cerberus~=1.3.2
+logutils~=0.3.5
+secretstorage==2.3.1 # Linux specific
+pypykatz @ https://github.com/AlessandroZ/pypykatz/archive/master.zip
+ed25519==1.5
+pygments~=2.6.0
+requests~=2.23.0
+tornado~=6.0.4
+win_inet_pton~=1.1.0 # Windows specific
+# scandir is built-in for Python 3.5+
+msgpack~=1.0.0
+hexdump~=3.3
+M2Crypto==0.35.2 # Needs swig, libssl-dev (system packages)
+fusepy~=3.0.1 # Needs fuse (system package)
+defusedxml~=0.6.0
+keyboard==0.13.4
+dateparser~=0.7.6
+puttykeys~=1.0.3
+pyelftools~=0.26
+python-magic~=0.4.18 # Needs libmagic-dev (system package)
+xattr~=0.9.7 # Linux specific
+dukpy~=0.2.3 # Might need libffi-dev
+pyaes~=1.6.1
+chardet~=3.0.4
+urllib-auth @ https://github.com/alxchk/urllib-auth/archive/master.zip
+# http_request - Assuming this is custom or provided by Pupy
+kcp @ git+https://github.com/n1nj4sec/pykcp
+pyuv @ git+https://github.com/n1nj4sec/pyuv@fix-building-against-python311
+tqdm~=4.46.0

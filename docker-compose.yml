@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  pupy-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PUPY_UID: ${PUPY_UID:-1000}
+        PUPY_GID: ${PUPY_GID:-1000}
+    image: pupy-server:py38-enhanced
+    container_name: pupy-server
+    restart: unless-stopped
+    # Default command is pupysh, can be overridden
+    command: pupysh
+    volumes:
+      # Mount config directory for custom configuration
+      - ${CONFIG_DIR:-./config}:/opt/pupy/config
+      # Mount output directory for generated payloads
+      - ${OUTPUT_DIR:-./output}:/opt/pupy/output
+      # Mount data directory for persistence
+      - ${DATA_DIR:-./data}:/opt/pupy/data
+    ports:
+      # SSL/TLS listener (default)
+      - "${PUPY_PORT:-443}:443"
+      - "${INTERNAL_IP:-0.0.0.0}:8443:8443"
+      # HTTP listeners
+      - "${INTERNAL_IP:-0.0.0.0}:80:80"
+      - "${INTERNAL_IP:-0.0.0.0}:8080:8080"
+      - "${INTERNAL_IP:-0.0.0.0}:8081:8081"
+      # Obfuscated transports
+      - "${INTERNAL_IP:-0.0.0.0}:9090:9090"  # obfs3
+      - "${INTERNAL_IP:-0.0.0.0}:9091:9091"  # rsa
+      # KCP/ECM transports
+      - "${INTERNAL_IP:-0.0.0.0}:123:123/udp"
+      - "${INTERNAL_IP:-0.0.0.0}:1234:1234"
+      - "${INTERNAL_IP:-0.0.0.0}:1235:1235"
+      # Web server for payloads (conditional)
+      - "${INTERNAL_IP:-0.0.0.0}:${WEBSERVER_PORT:-9000}:9000"
+    environment:
+      # Pass through environment variables
+      - EXTERNAL_IP=${EXTERNAL_IP:-}
+      - PUPY_TRANSPORT=${PUPY_TRANSPORT:-ssl}
+      - LOG_LEVEL=${LOG_LEVEL:-WARNING}
+      - DEBUG_MODE=${DEBUG_MODE:-false}
+      - ENABLE_WEBSERVER=${ENABLE_WEBSERVER:-false}
+      - ENABLE_DNSCNC=${ENABLE_DNSCNC:-false}
+      - ENABLE_IGD=${ENABLE_IGD:-false}
+      - VERIFY_CERTS=${VERIFY_CERTS:-true}
+      - CERT_PASSWORD=${CERT_PASSWORD:-}
+    networks:
+      - pupy-network
+
+  # Separate service for payload generation
+  pupy-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PUPY_UID: ${PUPY_UID:-1000}
+        PUPY_GID: ${PUPY_GID:-1000}
+    image: pupy-server:py38-enhanced
+    container_name: pupy-generator
+    command: pupygen
+    volumes:
+      # Mount output directory for generated payloads
+      - ${OUTPUT_DIR:-./output}:/opt/pupy/output
+      # Mount config for credentials
+      - ${CONFIG_DIR:-./config}:/opt/pupy/config
+    environment:
+      - EXTERNAL_IP=${EXTERNAL_IP:-}
+      - DEFAULT_OS=${DEFAULT_OS:-windows}
+      - DEFAULT_ARCH=${DEFAULT_ARCH:-x86}
+      - PYVER=${PYVER:-38}
+    networks:
+      - pupy-network
+    profiles:
+      - generator
+
+networks:
+  pupy-network:
+    driver: bridge
