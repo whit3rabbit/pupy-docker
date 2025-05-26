@@ -1,12 +1,6 @@
 services:
   pupy-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        PUPY_UID: ${PUPY_UID:-1000}
-        PUPY_GID: ${PUPY_GID:-1000}
-    image: pupy-server:py10
+    image: followthewhit3rabbit/pupy-server:py10
     container_name: pupy-server
     restart: unless-stopped
     # Default command is pupysh, can be overridden
@@ -51,13 +45,7 @@ services:
 
   # Separate service for payload generation
   pupy-generator:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        PUPY_UID: ${PUPY_UID:-1000}
-        PUPY_GID: ${PUPY_GID:-1000}
-    image: pupy-server:py10
+    image: followthewhit3rabbit/pupy-server:py10
     container_name: pupy-generator
     command: pupygen
     volumes:
@@ -73,6 +61,73 @@ services:
     networks:
       - pupy-network
     profiles:
+      - generator
+
+  # Development services for those who want to build manually
+  pupy-server-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PUPY_UID: ${PUPY_UID:-1000}
+        PUPY_GID: ${PUPY_GID:-1000}
+    image: pupy-server:py10-dev
+    container_name: pupy-server-dev
+    restart: unless-stopped
+    command: pupysh
+    volumes:
+      - ${CONFIG_DIR:-./config}:/opt/pupy/config
+      - ${OUTPUT_DIR:-./output}:/opt/pupy/output/output
+      - ${DATA_DIR:-./data}:/opt/pupy/data
+    ports:
+      - "${PUPY_PORT:-443}:443"
+      - "${INTERNAL_IP:-0.0.0.0}:8443:8443"
+      - "${INTERNAL_IP:-0.0.0.0}:80:80"
+      - "${INTERNAL_IP:-0.0.0.0}:8080:8080"
+      - "${INTERNAL_IP:-0.0.0.0}:8081:8081"
+      - "${INTERNAL_IP:-0.0.0.0}:9090:9090"
+      - "${INTERNAL_IP:-0.0.0.0}:9091:9091"
+      - "${INTERNAL_IP:-0.0.0.0}:123:123/udp"
+      - "${INTERNAL_IP:-0.0.0.0}:1234:1234"
+      - "${INTERNAL_IP:-0.0.0.0}:1235:1235"
+      - "${INTERNAL_IP:-0.0.0.0}:${WEBSERVER_PORT:-9000}:9000"
+    environment:
+      - EXTERNAL_IP=${EXTERNAL_IP:-}
+      - PUPY_TRANSPORT=${PUPY_TRANSPORT:-ssl}
+      - LOG_LEVEL=${LOG_LEVEL:-WARNING}
+      - DEBUG_MODE=${DEBUG_MODE:-false}
+      - ENABLE_WEBSERVER=${ENABLE_WEBSERVER:-false}
+      - ENABLE_DNSCNC=${ENABLE_DNSCNC:-false}
+      - ENABLE_IGD=${ENABLE_IGD:-false}
+      - VERIFY_CERTS=${VERIFY_CERTS:-true}
+      - CERT_PASSWORD=${CERT_PASSWORD:-}
+    networks:
+      - pupy-network
+    profiles:
+      - dev
+
+  pupy-generator-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PUPY_UID: ${PUPY_UID:-1000}
+        PUPY_GID: ${PUPY_GID:-1000}
+    image: pupy-server:py10-dev
+    container_name: pupy-generator-dev
+    command: pupygen
+    volumes:
+      - ${OUTPUT_DIR:-./output}:/opt/pupy/output/output
+      - ${CONFIG_DIR:-./config}:/opt/pupy/config
+    environment:
+      - EXTERNAL_IP=${EXTERNAL_IP:-}
+      - DEFAULT_OS=${DEFAULT_OS:-windows}
+      - DEFAULT_ARCH=${DEFAULT_ARCH:-x86}
+      - PYVER=${PYVER:-10}
+    networks:
+      - pupy-network
+    profiles:
+      - dev
       - generator
 
 networks:

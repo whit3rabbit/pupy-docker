@@ -23,22 +23,25 @@ pupy-docker/
 
 ## Quick Start
 
-1. **Build the image:**
-
-   ```bash
-   docker-compose build
-   ```
-
-2. **Start the Pupy server:**
+1. **Start the Pupy server with pre-built image:**
 
    ```bash
    docker-compose up -d pupy-server
    ```
 
-3. **View logs:**
+   The default configuration uses a pre-built image from Docker Hub (`followthewhit3rabbit/pupy-server:py10`).
+
+2. **View logs:**
 
    ```bash
    docker-compose logs -f pupy-server
+   ```
+
+3. **For development or to build locally:**
+
+   ```bash
+   # Build and run the development version
+   docker-compose --profile dev up -d pupy-server-dev
    ```
 
 ## Configuration
@@ -125,13 +128,128 @@ Pupy uses Python's module system:
 - `python -m pupy.cli.pupygen` runs pupygen module
 - Both commands properly set up the Python path and imports
 
-### Using Profile for Generator
+## Using Profiles
 
-You can also use the generator profile:
+### Generator Profile
+
+You can use the generator profile to run payload generation:
 
 ```bash
 docker-compose --profile generator run pupy-generator pupygen -O windows -A x64
 ```
+
+### Development Profile
+
+The docker-compose.yml includes a development profile for users who want to build the image locally instead of using the pre-built version from Docker Hub:
+
+```bash
+# Build and start the development server
+docker-compose --profile dev up -d pupy-server-dev
+
+# Build and run the generator in development mode
+docker-compose --profile dev --profile generator run pupy-generator-dev pupygen -O windows -A x64
+```
+
+### Deployment Options
+
+#### Using Pre-built Images (Recommended)
+
+By default, the docker-compose.yml uses the pre-built image `followthewhit3rabbit/pupy-server:py10` from Docker Hub. This is the recommended approach for most users as it:
+
+- Eliminates build-time errors and dependencies
+- Ensures consistent environments across deployments
+- Significantly reduces setup time
+
+#### Building Locally
+
+For developers who need to customize the image or contribute to the project:
+
+1. Use the development profile as described above
+2. Make your changes to the Dockerfile or configuration files
+3. Test thoroughly before deployment
+
+To build and push a new version to Docker Hub (maintainers only):
+
+```bash
+# Build with no cache
+docker-compose build --no-cache
+
+# Tag the image
+docker tag pupy-server:py10 followthewhit3rabbit/pupy-server:py10
+
+# Push to Docker Hub
+docker push followthewhit3rabbit/pupy-server:py10
+```
+
+### Offline Deployment
+
+For air-gapped environments or situations where internet access is restricted, you can save the Docker image locally and transfer it to the target system.
+
+#### On a system with internet access
+
+1. Pull the image:
+
+   ```bash
+   docker pull followthewhit3rabbit/pupy-server:py10
+   ```
+
+2. Save the image to a file:
+
+   ```bash
+   docker save -o pupy-server-py10.tar followthewhit3rabbit/pupy-server:py10
+   ```
+
+3. Transfer the `pupy-server-py10.tar` file to the offline system using physical media (USB drive, etc.)
+
+#### On the offline system
+
+1. Load the image from the file:
+
+   ```bash
+   docker load -i pupy-server-py10.tar
+   ```
+
+2. Verify the image is available:
+
+   ```bash
+   docker images
+   ```
+
+3. Create a docker-compose.yml file on the offline system with the configuration from this repository
+
+4. Run the container:
+
+   ```bash
+   docker-compose up -d pupy-server
+   ```
+
+#### Additional Considerations for Offline Use
+
+- Ensure all necessary configuration files and dependencies are included with your transfer
+- For a completely portable solution, consider creating a directory structure like this:
+
+  ```text
+  pupy-offline/
+  ├── pupy-server-py10.tar     # Docker image file
+  ├── docker-compose.yml       # Configuration file
+  ├── config/                  # Configuration directory
+  │   └── pupy.conf            # Custom configuration
+  ├── data/                    # For persistent data
+  └── output/                  # For generated payloads
+  ```
+
+- Include a simple setup script:
+
+  ```bash
+  #!/bin/bash
+  # Load the Docker image
+  docker load -i pupy-server-py10.tar
+  
+  # Start the container
+  docker-compose up -d
+  
+  echo "Pupy server ready at https://localhost"
+  ```
 
 ## Port Mappings
 
