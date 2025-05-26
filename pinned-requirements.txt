@@ -4,7 +4,7 @@ pycryptodome~=3.19.0
 pefile~=2019.4.18
 # Fix:PyYAML 5.4.1 is not compatible with Python 3.10 for newer Cython API
 pyyaml~=6.0.1
-rsa==4.0
+rsa==4.7
 netaddr==0.7.19
 ecdsa==0.13
 paramiko==2.7.2
