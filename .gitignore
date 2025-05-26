@@ -5,3 +5,4 @@ config/pupy.conf
 data/
 output/
 .vscode
+docs/*

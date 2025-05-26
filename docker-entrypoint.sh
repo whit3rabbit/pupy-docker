@@ -57,6 +57,8 @@ case "$1" in
         shift
         # Change to output directory for payload generation
         cd /opt/pupy/output
+        # Ensure the subdirectory specified in common pupygen commands (e.g., -o ./output/file) exists
+        mkdir -p ./output
         # Use the proper module path for pupygen
         exec python -m pupy.cli.pupygen "$@"
         ;;

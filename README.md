@@ -1,6 +1,6 @@
 # Pupy C2 Docker Setup Guide
 
-Pupy is no longer mainted and a lot of the requirements are outdated. This is a dockerized version of Pupy using pinned requirements and python3.8.
+Pupy is no longer mainted and a lot of the requirements are outdated. This is a dockerized version of Pupy using the nextgen branch. It has pinned requirements and python3.10.
 
 This enhanced Docker setup provides a flexible way to run both the Pupy server (pupysh) and payload generator (pupygen).
 

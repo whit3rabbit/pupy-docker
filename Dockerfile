@@ -1,5 +1,5 @@
-# Use an official Python 3.8 slim image based on Debian Buster
-FROM python:3.8-slim-buster AS builder
+# Use an official Python 3.10 slim image based on Debian Buster
+FROM python:3.10-slim-buster AS builder
 
 # **** Set ARG Values ****
 ARG PUPY_USER=pupy
@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED=1
 # ********** Installing System Dependencies ***************
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    wget curl sudo nano git build-essential pkg-config python3-dev locales \
+    wget curl sudo nano git build-essential pkg-config python3-dev locales cython \
     libssl-dev libffi-dev openssh-client sslh libcap2-bin john vim-tiny \
     less osslsigncode nmap net-tools libmagic-dev swig autoconf automake \
     unzip libtool ncurses-term tcpdump libpam-dev fuse libuv1-dev libfuse2 \
@@ -61,6 +61,30 @@ RUN mkdir -p ${PUPY_HOME}/pupy/payload_templates \
     && mkdir -p /home/${PUPY_USER}/.config/pupy/ \
     && mkdir -p ${PUPY_HOME}/output \
     && mkdir -p ${PUPY_HOME}/config
+
+# Download precompiled payload templates and rename to include -310 suffix
+RUN echo "Downloading Pupy precompiled payload templates..." && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx64-310.dll "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx64.dll" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx64-310.exe "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx64.exe" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx64-310.lin "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx64.lin" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx64-310.lin.so "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx64.lin.so" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx64d-310.dll "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx64d.dll" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx64d-310.exe "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx64d.exe" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx64d-310.lin "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx64d.lin" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx64d-310.lin.so "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx64d.lin.so" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx86-310.dll "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx86.dll" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx86-310.exe "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx86.exe" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx86-310.lin "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx86.lin" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx86-310.lin.so "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx86.lin.so" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx86d-310.dll "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx86d.dll" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx86d-310.exe "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx86d.exe" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx86d-310.lin "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx86d.lin" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/pupyx86d-310.lin.so "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/pupyx86d.lin.so" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/linux-amd64.zip "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/linux-amd64.zip" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/linux-x86.zip "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/linux-x86.zip" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/windows-amd64.zip "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/windows-amd64.zip" && \
+    curl -L -s -o ${PUPY_HOME}/pupy/payload_templates/windows-x86.zip "https://gitlab-student.centralesupelec.fr/bastien.le-guern/secef-apt29/-/raw/master/secef-pupy/pupy/payload_templates/windows-x86.zip" && \
+    echo "Finished downloading Pupy precompiled payload templates."
 
 # Copy default config file
 RUN cp ${PUPY_HOME}/pupy/conf/pupy.conf.default /home/${PUPY_USER}/.config/pupy/pupy.conf

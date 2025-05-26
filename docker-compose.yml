@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   pupy-server:
     build:
@@ -8,7 +6,7 @@ services:
       args:
         PUPY_UID: ${PUPY_UID:-1000}
         PUPY_GID: ${PUPY_GID:-1000}
-    image: pupy-server:py38
+    image: pupy-server:py10
     container_name: pupy-server
     restart: unless-stopped
     # Default command is pupysh, can be overridden
@@ -59,7 +57,7 @@ services:
       args:
         PUPY_UID: ${PUPY_UID:-1000}
         PUPY_GID: ${PUPY_GID:-1000}
-    image: pupy-server:py38
+    image: pupy-server:py10
     container_name: pupy-generator
     command: pupygen
     volumes:
@@ -71,7 +69,7 @@ services:
       - EXTERNAL_IP=${EXTERNAL_IP:-}
       - DEFAULT_OS=${DEFAULT_OS:-windows}
       - DEFAULT_ARCH=${DEFAULT_ARCH:-x86}
-      - PYVER=${PYVER:-38}
+      - PYVER=${PYVER:-10}
     networks:
       - pupy-network
     profiles:
