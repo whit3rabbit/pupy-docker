@@ -15,7 +15,7 @@ services:
       # Mount config directory for custom configuration
       - ${CONFIG_DIR:-./config}:/opt/pupy/config
       # Mount output directory for generated payloads
-      - ${OUTPUT_DIR:-./output}:/opt/pupy/output
+      - ${OUTPUT_DIR:-./output}:/opt/pupy/output/output
       # Mount data directory for persistence
       - ${DATA_DIR:-./data}:/opt/pupy/data
     ports:
@@ -62,7 +62,7 @@ services:
     command: pupygen
     volumes:
       # Mount output directory for generated payloads
-      - ${OUTPUT_DIR:-./output}:/opt/pupy/output
+      - ${OUTPUT_DIR:-./output}:/opt/pupy/output/output
       # Mount config for credentials
       - ${CONFIG_DIR:-./config}:/opt/pupy/config
     environment:
